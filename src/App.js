@@ -57,9 +57,7 @@ function App() {
       setIsStarted(true);
       setDisappear(false);
       setFlagbutton(!flagbutton)
-
     }
-    // Không thay đổi vị trí của các hình tròn khi restart
   };
 
   const ref = useRef();
