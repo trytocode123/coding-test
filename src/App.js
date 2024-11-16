@@ -14,12 +14,12 @@ function App() {
   const [stateLabelSuccess, setStateLabelSuccess] = useState(false);
 
   const [stateLabelFail, setStateLabelFail] = useState(false);
-  const [btnAutoPlay, setButtonAutoPlay] = useState(false);
+  // const [btnAutoPlay, setButtonAutoPlay] = useState(false);
   const [toggleOnOff, setToggleOnOff] = useState(false);
-  // Hàm để tạo vị trí ngẫu nhiên cho các hình tròn
+  // vị trí ngẫu nhiên cho các hình tròn
   const getRandomPosition = () => {
-    const x = Math.floor(Math.random() * 90); // Giới hạn vị trí ngẫu nhiên trong khoảng 80% chiều rộng màn hình
-    const y = Math.floor(Math.random() * 90); // Giới hạn vị trí ngẫu nhiên trong khoảng 80% chiều cao màn hình
+    const x = Math.floor(Math.random() * 100);
+    const y = Math.floor(Math.random() * 100);
     return { top: `${y}%`, left: `${x}%` };
   };
 
@@ -29,9 +29,9 @@ function App() {
     refClicks.current.forEach((button, index) => {
       setTimeout(() => {
         if (button) {
-          button.click(); // Thực hiện click
+          button.click();
         }
-      }, index * 1000); // Mỗi nút cách nhau 1000ms
+      }, index * 1000);
     });
   }, [toggleOnOff]);
 
