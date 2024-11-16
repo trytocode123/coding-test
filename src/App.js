@@ -1,10 +1,7 @@
-
-import './App.css';
-import React, { useState, useEffect, useRef } from 'react';
-
+import "./App.css";
+import React, { useState, useEffect, useRef } from "react";
 
 function App() {
-
   const [number, setNumber] = useState(0);
   const [circles, setCircles] = useState([]);
   const [startTime, setStartTime] = useState(null);
@@ -13,15 +10,30 @@ function App() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [disappear, setDisappear] = useState(false);
   const [flagbutton, setFlagbutton] = useState(true);
+  const [stateHeader, setStateHeader] = useState(true);
+  const [stateLabelSuccess, setStateLabelSuccess] = useState(false);
 
-
-
+  const [stateLabelFail, setStateLabelFail] = useState(false);
+  const [btnAutoPlay, setButtonAutoPlay] = useState(false);
+  const [toggleOnOff, setToggleOnOff] = useState(false);
   // Hàm để tạo vị trí ngẫu nhiên cho các hình tròn
   const getRandomPosition = () => {
-    const x = Math.floor(Math.random() * 80); // Giới hạn vị trí ngẫu nhiên trong khoảng 80% chiều rộng màn hình
-    const y = Math.floor(Math.random() * 80); // Giới hạn vị trí ngẫu nhiên trong khoảng 80% chiều cao màn hình
+    const x = Math.floor(Math.random() * 90); // Giới hạn vị trí ngẫu nhiên trong khoảng 80% chiều rộng màn hình
+    const y = Math.floor(Math.random() * 90); // Giới hạn vị trí ngẫu nhiên trong khoảng 80% chiều cao màn hình
     return { top: `${y}%`, left: `${x}%` };
   };
+
+  const refClicks = useRef([]);
+
+  useEffect(() => {
+    refClicks.current.forEach((button, index) => {
+      setTimeout(() => {
+        if (button) {
+          button.click(); // Thực hiện click
+        }
+      }, index * 1000); // Mỗi nút cách nhau 1000ms
+    });
+  }, [toggleOnOff]);
 
   useEffect(() => {
     if (number > 0) {
@@ -30,6 +42,7 @@ function App() {
         position: getRandomPosition(),
       }));
       setCircles(newCircles);
+
       setIsStarted(false);
       setNextExpected(1);
       setElapsedTime(0);
@@ -42,9 +55,8 @@ function App() {
       timer = setInterval(() => {
         setElapsedTime((Date.now() - startTime) / 1000);
       }, 100);
-      console.log(timer)
+      console.log(timer);
       console.log(startTime);
-
     } else {
       clearInterval(timer);
     }
@@ -52,86 +64,137 @@ function App() {
   }, [isStarted, startTime]);
 
   const handleStart = () => {
-    if(ref.current.value !== '' && ref.current.value !== '0') {
+    if (number <= 0) {
+      ref.current.focus();
+      return;
+    }
+    if (ref.current.value !== "" && ref.current.value !== "0") {
       setStartTime(Date.now());
       setIsStarted(true);
       setDisappear(false);
-      setFlagbutton(!flagbutton)
+      setFlagbutton(!flagbutton);
     }
   };
 
   const ref = useRef();
-  
+
   const handleRestart = () => {
-   setDisappear(disappear => {
-   setDisappear(!disappear)
-   })
-   ref.current.value = '';
-   setIsStarted(!startTime);
-   setElapsedTime(0);
+    setDisappear((disappear) => {
+      setDisappear(!disappear);
+    });
+    ref.current.value = "";
+    setIsStarted(!startTime);
+    setElapsedTime(0);
     setFlagbutton(!flagbutton);
+    setNumber(0);
+    setStateLabelFail(false);
+    setStateLabelSuccess(false);
+    setToggleOnOff((state) => !state);
+    if (toggleOnOff === false) {
+      setToggleOnOff(false);
+    }
+    if (stateLabelFail === false || stateLabelSuccess === false) {
+      setStateHeader(true);
+    }
   };
 
-  const handleClick = value => {
+  const handleClick = (value) => {
     if (value === nextExpected) {
       setNextExpected(nextExpected + 1);
-      setCircles(circles.filter(circle => circle.id !== value));
+      setCircles(circles.filter((circle) => circle.id !== value));
       if (nextExpected === number) {
         setIsStarted(false);
-        const endTime = Date.now();
-        alert(`All Clear ${(endTime - startTime) / 1000} s`);
+
+        setStateHeader((state) => !state);
+
+        setStateLabelSuccess((state) => !state);
+
+        setToggleOnOff((state) => !state);
       }
     } else {
       setIsStarted(false);
-      const endTime = Date.now();
-      alert(`Game Over ${(endTime - startTime) / 1000} s`);
-      setFlagbutton(!flagbutton);
+      setStateLabelFail((state) => !state);
+
+      setStateHeader((state) => !state);
     }
   };
 
   return (
     <div>
+      {stateHeader && <h3 style={{ marginBottom: 0 }}>LET'S PLAY</h3>}
+      {stateLabelSuccess && <h3 style={{ color: "green" }}>ALL CLEARED</h3>}
+      {stateLabelFail && <h3 style={{ color: "red" }}>GAME OVER</h3>}
       <span>Points: </span>
       <input
         ref={ref}
-        type='number'
-        onChange={e => setNumber(parseInt(e.target.value))}
-       
+        type="number"
+        onChange={(e) => setNumber(Number.parseInt(e.target.value))}
       />
-      { flagbutton&& <button onClick={handleStart}>Start</button>}
-      {!flagbutton && <button onClick={handleRestart}>Restart</button>}
 
-      <p>Time: {elapsedTime.toFixed(1)}s</p>
+      <p style={{ marginTop: 0, marginBottom: 0 }}>
+        Time: {elapsedTime.toFixed(1)}s
+      </p>
+      {flagbutton && <button onClick={handleStart}>Play</button>}
+      {!flagbutton && (
+        <div>
+          <button style={{ marginRight: "20px" }} onClick={handleRestart}>
+            Restart
+          </button>
+          {isStarted && (
+            <button
+              onClick={() => {
+                // setButtonAutoPlay((state) => !state);
+                setToggleOnOff(true);
+              }}
+            >
+              Auto Play: {toggleOnOff ? "ON" : "OFF"}
+            </button>
+          )}
+        </div>
+      )}
       {isStarted && (
         <div
           style={{
-            position: 'relative',
-            width: '100%',
-            height: '500px',
-            marginTop: '20px',
+            display: "flex",
+            alignContent: "center",
+            justifyContent: "center",
           }}
         >
-          {!disappear && circles.map(circle => (
-            <div
-              key={circle.id}
-              onClick={() => handleClick(circle.id)}
-              style={{
-                position: 'absolute',
-                width: '50px',
-                height: '50px',
-                borderRadius: '50%',
-                backgroundColor: 'lightblue',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                cursor: 'pointer',
-                fontSize: '18px',
-                ...circle.position,
-              }}
-            >
-              {circle.id}
-            </div>
-          ))}
+          <div
+            style={{
+              position: "relative",
+              width: "500px",
+              height: "500px",
+              marginTop: "20px",
+
+              marginBottom: "200px",
+              border: "black solid",
+            }}
+          >
+            {!disappear &&
+              circles.map((circle, i) => (
+                <button
+                  ref={(el) => (refClicks.current[i] = el)}
+                  key={circle.id}
+                  onClick={() => handleClick(circle.id)}
+                  style={{
+                    position: "absolute",
+                    width: "50px",
+                    height: "50px",
+                    borderRadius: "50%",
+                    backgroundColor: "lightblue",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    fontSize: "18px",
+                    ...circle.position,
+                  }}
+                >
+                  {circle.id}
+                </button>
+              ))}
+          </div>
         </div>
       )}
     </div>
