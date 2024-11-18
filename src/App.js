@@ -18,8 +18,8 @@ function App() {
   const [toggleOnOff, setToggleOnOff] = useState(false);
   // vị trí ngẫu nhiên cho các hình tròn
   const getRandomPosition = () => {
-    const x = Math.floor(Math.random() * 100);
-    const y = Math.floor(Math.random() * 100);
+    const x = Math.floor(Math.random() * 80);
+    const y = Math.floor(Math.random() * 80);
     return { top: `${y}%`, left: `${x}%` };
   };
 
