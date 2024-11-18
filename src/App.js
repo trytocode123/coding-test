@@ -182,7 +182,7 @@ function App() {
                     width: "50px",
                     height: "50px",
                     borderRadius: "50%",
-                    backgroundColor: "lightblue",
+                    backgroundColor: "orange",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
